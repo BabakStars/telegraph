@@ -1,0 +1,32 @@
+// Include RadioHead Amplitude Shift Keying Library
+#include <RH_ASK.h>
+// Include dependant SPI Library 
+#include <SPI.h> 
+ char msg[500];
+// Create Amplitude Shift Keying Object
+RH_ASK rf_driver;
+ //uint8_t *msg[80];
+void setup()
+{
+    // Initialize ASK Object
+    rf_driver.init();
+    Serial.begin(9600);
+}
+ 
+void loop()
+{
+    if(Serial.available())
+    {
+          
+          String msgs = Serial.readStringUntil('\n');
+          Serial.println(msgs);
+          for(int i=0 ; i<msgs.length() ; i++)
+          {
+            msg [i] = msgs[i];
+          }
+          rf_driver.send((uint8_t *)msg, strlen(msg));
+          rf_driver.waitPacketSent();
+          delay(100);
+    }
+
+}
