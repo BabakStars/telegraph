@@ -1,0 +1,53 @@
+// Include RadioHead Amplitude Shift Keying Library
+#include <RH_ASK.h>
+// Include dependant SPI Library 
+#include <SPI.h> 
+
+#include <Wire.h>
+#include <Adafruit_GFX.h> 
+#include <Adafruit_SSD1306.h> 
+
+Adafruit_SSD1306 display(-1);
+// Create Amplitude Shift Keying Object
+RH_ASK rf_driver;
+ 
+void setup()
+{
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C); 
+    display.clearDisplay();
+    // Initialize ASK Object
+    rf_driver.init();
+    // Setup Serial Monitor
+    Serial.begin(9600);
+      display.setTextSize(1);
+  display.setTextColor(WHITE);
+}
+ 
+void loop()
+{   
+    
+    // Set buffer to size of expected message
+    uint8_t buf[500];
+    uint8_t buflen = sizeof(buf);
+    // Check if received packet is correct size
+    if (rf_driver.recv(buf, &buflen))
+    {
+      
+      // Message received with valid checksum
+      Serial.print("Message Received: ");
+      Serial.println((char*)buf); 
+      display.setCursor(0,0);
+      display.println((char*)buf); 
+      display.display();
+      delay(1000);
+      display.clearDisplay();       
+    }
+    else
+    {
+      display.clearDisplay(); 
+      display.setCursor(0,0);
+      display.println("Out of rang!"); 
+      display.display();
+      delay(1000);
+    }
+}
